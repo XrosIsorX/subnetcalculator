@@ -16,7 +16,7 @@
           <label class="control-label">Subnet</label>
       </div>
       <div class="col-sm-6 form-col">
-        <select>
+        <select id="subnet">
           <option value="32">255.255.255.255 / 32</option>
           <option value="31">255.255.255.254 / 31</option>
           <option value="30">255.255.255.252 / 30</option>
@@ -57,17 +57,66 @@
           <label class="control-label">IP Address</label>
       </div>
       <div class="col-sm-6 form-col">
-        <input type="text" value="158.108.12.34">
+        <input id="ip" type="text" value="158.108.12.34">
       </div>
     </div>
     <div class="col-sm-2 form-col">
-      <button class="btn btn-default btn-primary" type="submit">Calculate</button>
+      <button class="btn btn-default btn-primary" type="submit" onclick="calculate()">Calculate</button>
     </div>
+
+    <table id="table"></table>
 
   </body>
 
-  <scirpt>
-    
-  </scirpt>
-
 </html>
+
+<script>
+  var subnet = document.getElementById("subnet");
+  var ip = document.getElementById("ip");
+  var table = document.getElementById("table");
+
+  function createPossibleTable() {
+    header = ["Network Address", "Usable Host Range", "Broadcast Address:"]
+    data = [];
+    var tr = document.createElement("tr");
+    for (var i=0; i<header.length; i++) {
+     var txt = document.createTextNode(header[i]);
+     var th = document.createElement("th");
+     th.appendChild(txt);
+     tr.appendChild(th)
+     table.appendChild(tr);
+    }
+
+    var tr = document.createElement("tr");
+    for (var i=0; i<data.length; i++) {
+     var txt = document.createTextNode(data[i]);
+     var td = document.createElement("td");
+     td.appendChild(txt);
+     tr.appendChild(td)
+     table.appendChild(tr);
+    }
+  }
+
+  function createBaseTable() {
+    header = ["IP Address", "Network Address", "Usable Host IP Range", "Broadcast Address", "Total Number of Hosts", "Number of Usable Hosts", "Subnet Mask", "Wildcard Mask", "Binary Subnet Mask", "IP Class", "CIDR Notation", "IP Type", "Short", "Binary ID", "Integer ID", "Hex ID", "in-addr.arpa", "IPv4 Mapped Address", "6to4 Prefix"]
+    data = [];
+    for (var i=0; i<header.length; i++) {
+      var tr = document.createElement("tr");
+      var txt = document.createTextNode(header[i]);
+      var datum = document.createTextNode(data[i]);
+      var th = document.createElement("th");
+      var td = document.createElement("td");
+      td.appendChild(datum)
+      th.appendChild(txt)
+      tr.appendChild(th)
+      tr.appendChild(td)
+      table.appendChild(tr);
+    }
+  }
+
+  function calculate() {
+    createBaseTable()
+    createPossibleTable()
+  }
+
+</script>
