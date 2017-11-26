@@ -73,10 +73,53 @@
 </html>
 
 <script>
+  var MAXBIT = 32
+
   var subnet = document.getElementById("subnet");
   var ip = document.getElementById("ip");
   var baseTable = document.getElementById("baseTable");
   var possibleTable = document.getElementById("possibleTable");
+
+  function splitBinToIp(ip){
+    blocks = []
+    blocks[0] = ip.substring(0,8)
+    blocks[1] = ip.substring(8,16)
+    blocks[2] = ip.substring(16,24)
+    blocks[3] = ip.substring(24,32)
+    return blocks
+  }
+
+  function bitToDec(bitString) {
+    return parseInt(bitString, 2).toString(10)
+  }
+
+  // function decToBit(string) {
+  //   return parseInr
+  // }
+
+  function replaceStringAt(string, ch, index) {
+    return string.substring(0, index) + ch + string.substring(index + 1)
+  }
+
+  // function splitIpToBin(ip){
+  //   ip = ip.split(',')
+  //   ip.
+  // }
+
+  function subnetMask() {
+    var sub = 0xffffffff
+    sub = sub.toString(2)
+    for(var i=subnet.value; i<MAXBIT; i++){
+      sub = replaceStringAt(sub, '0', i)
+    }
+    sub = splitBinToIp(sub)
+    sub = bitToDec(sub[0]) + '.' + bitToDec(sub[1]) + '.' + bitToDec(sub[2]) + '.' + bitToDec(sub[3])
+    return sub
+  }
+
+  function networkAddress(){
+    ip
+  }
 
   function createPossibleTable() {
     headers = ["Network Address", "Usable Host Range", "Broadcast Address:"]
@@ -104,8 +147,10 @@
   function createBaseTable() {
     headers = ["IP Address", "Network Address", "Usable Host IP Range", "Broadcast Address", "Total Number of Hosts", "Number of Usable Hosts", "Subnet Mask", "Wildcard Mask", "Binary Subnet Mask", "IP Class", "CIDR Notation", "IP Type", "Short", "Binary ID", "Integer ID", "Hex ID", "in-addr.arpa", "IPv4 Mapped Address", "6to4 Prefix"]
     data = [];
-    baseTable.innerHTML = ""
     data[0] = ip.value
+    // data[1] = 
+    data[6] = subnetMask()
+    baseTable.innerHTML = ""
     for (var i=0; i<headers.length; i++) {
       var tr = document.createElement("tr");
       var txt = document.createTextNode(headers[i]);
@@ -118,11 +163,6 @@
       tr.appendChild(td)
       baseTable.appendChild(tr);
     }
-  }
-
-  function calculate() {
-    ips = ip.value.split(',')
-
   }
 
   function show() {
