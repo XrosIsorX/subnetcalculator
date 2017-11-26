@@ -121,6 +121,21 @@
     ip
   }
 
+  function subClass(){
+    if(subnet.value <= 8){
+      return '-'
+    }
+    else if(subnet.value <= 16){
+      return 'A'
+    }
+    else if(subnet.value <= 24){
+      return 'B'
+    }
+    else if(subnet.value <= 32){
+      return 'C'
+    }
+  }
+
   function createPossibleTable() {
     headers = ["Network Address", "Usable Host Range", "Broadcast Address:"]
     data = [];
@@ -148,8 +163,10 @@
     headers = ["IP Address", "Network Address", "Usable Host IP Range", "Broadcast Address", "Total Number of Hosts", "Number of Usable Hosts", "Subnet Mask", "Wildcard Mask", "Binary Subnet Mask", "IP Class", "CIDR Notation", "IP Type", "Short", "Binary ID", "Integer ID", "Hex ID", "in-addr.arpa", "IPv4 Mapped Address", "6to4 Prefix"]
     data = [];
     data[0] = ip.value
-    // data[1] = 
+    data[1] =
     data[6] = subnetMask()
+    data[9] = subClass()
+    data[10] = '/' + subnet.value
     baseTable.innerHTML = ""
     for (var i=0; i<headers.length; i++) {
       var tr = document.createElement("tr");
