@@ -61,10 +61,12 @@
       </div>
     </div>
     <div class="col-sm-2 form-col">
-      <button class="btn btn-default btn-primary" type="submit" onclick="calculate()">Calculate</button>
+      <button class="btn btn-default btn-primary" type="submit" onclick="show()">Calculate</button>
     </div>
 
-    <table id="table"></table>
+    <table id="baseTable"></table>
+
+    <table id="possibleTable"></table>
 
   </body>
 
@@ -73,18 +75,20 @@
 <script>
   var subnet = document.getElementById("subnet");
   var ip = document.getElementById("ip");
-  var table = document.getElementById("table");
+  var baseTable = document.getElementById("baseTable");
+  var possibleTable = document.getElementById("possibleTable");
 
   function createPossibleTable() {
-    header = ["Network Address", "Usable Host Range", "Broadcast Address:"]
+    headers = ["Network Address", "Usable Host Range", "Broadcast Address:"]
     data = [];
+    possibleTable.innerHTML = ""
     var tr = document.createElement("tr");
-    for (var i=0; i<header.length; i++) {
-     var txt = document.createTextNode(header[i]);
+    for (var i=0; i<headers.length; i++) {
+     var txt = document.createTextNode(headers[i]);
      var th = document.createElement("th");
      th.appendChild(txt);
      tr.appendChild(th)
-     table.appendChild(tr);
+     possibleTable.appendChild(tr);
     }
 
     var tr = document.createElement("tr");
@@ -93,16 +97,18 @@
      var td = document.createElement("td");
      td.appendChild(txt);
      tr.appendChild(td)
-     table.appendChild(tr);
+     possibleTable.appendChild(tr);
     }
   }
 
   function createBaseTable() {
-    header = ["IP Address", "Network Address", "Usable Host IP Range", "Broadcast Address", "Total Number of Hosts", "Number of Usable Hosts", "Subnet Mask", "Wildcard Mask", "Binary Subnet Mask", "IP Class", "CIDR Notation", "IP Type", "Short", "Binary ID", "Integer ID", "Hex ID", "in-addr.arpa", "IPv4 Mapped Address", "6to4 Prefix"]
+    headers = ["IP Address", "Network Address", "Usable Host IP Range", "Broadcast Address", "Total Number of Hosts", "Number of Usable Hosts", "Subnet Mask", "Wildcard Mask", "Binary Subnet Mask", "IP Class", "CIDR Notation", "IP Type", "Short", "Binary ID", "Integer ID", "Hex ID", "in-addr.arpa", "IPv4 Mapped Address", "6to4 Prefix"]
     data = [];
-    for (var i=0; i<header.length; i++) {
+    baseTable.innerHTML = ""
+    data[0] = ip.value
+    for (var i=0; i<headers.length; i++) {
       var tr = document.createElement("tr");
-      var txt = document.createTextNode(header[i]);
+      var txt = document.createTextNode(headers[i]);
       var datum = document.createTextNode(data[i]);
       var th = document.createElement("th");
       var td = document.createElement("td");
@@ -110,11 +116,16 @@
       th.appendChild(txt)
       tr.appendChild(th)
       tr.appendChild(td)
-      table.appendChild(tr);
+      baseTable.appendChild(tr);
     }
   }
 
   function calculate() {
+    ips = ip.value.split(',')
+
+  }
+
+  function show() {
     createBaseTable()
     createPossibleTable()
   }
