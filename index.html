@@ -76,11 +76,37 @@
 <script>
 
   var MAXBIT = 32
+  var BLOCKS = 4
 
   var subnet = document.getElementById("subnet");
   var ip = document.getElementById("ip");
   var baseTable = document.getElementById("baseTable");
   var possibleTable = document.getElementById("possibleTable");
+
+  function replaceStringAt(string, ch, index) {
+    return string.substring(0, index) + ch + string.substring(index + 1)
+  }
+
+  function decToBit(string) {
+    var bitString = parseInt(string, 10).toString(2)
+    while (bitString.length < 8) {
+      bitString = '0' + bitString
+    }
+    return bitString
+  }
+
+  function splitBit(ipString){
+    blocks = []
+    blocks[0] = ipString.substring(0,8)
+    blocks[1] = ipString.substring(8,16)
+    blocks[2] = ipString.substring(16,24)
+    blocks[3] = ipString.substring(24,32)
+    return blocks
+  }
+
+  function bitToDec(bitString) {
+    return parseInt(bitString, 2).toString(10)
+  }
 
   function splitBinToIp(ip){
     blocks = []
@@ -91,15 +117,41 @@
     return blocks
   }
 
-  function bitToDec(bitString) {
-    return parseInt(bitString, 2).toString(10)
+  // Main function
+
+  function networkAddress(){
+    var ips = ip.value.split('.')
+    var bitString = ""
+    for (var i=0; i<BLOCKS; i++) {
+      bitString += decToBit(ips[i])
+    }
+
+    for(var i=subnet.value; i<MAXBIT; i++){
+      bitString = replaceStringAt(bitString, '0', i)
+    }
+    bitString = splitBit(bitString)
+    bitString = bitToDec(bitString[0]) + '.' + bitToDec(bitString[1]) + '.' + bitToDec(bitString[2]) + '.' + bitToDec(bitString[3])
+    return bitString
   }
 
+  function ipRange (network, broadcast) {
+    var ipNetwork = network
+    var ipBroadcast = broadcast
+    if (ipNetwork == ipBroadcast) {
+      return "NA"
+    }
 
-  function replaceStringAt(string, ch, index) {
-    return string.substring(0, index) + ch + string.substring(index + 1)
+    var ipNetworks = ipNetwork.split('.')
+    var ipBroadcasts = ipBroadcast.split('.')
+
+    ipNetworks[3] = parseInt(ipNetworks[3]) + 1;
+    ipBroadcasts[3] -= 1;
+
+    ipNetwork = ipNetworks[0] + '.' + ipNetworks[1] + '.' + ipNetworks[2] + '.' + ipNetworks[3]
+    ipBroadcast = ipBroadcasts[0] + '.' + ipBroadcasts[1] + '.' + ipBroadcasts[2] + '.' + ipBroadcasts[3]
+
+    return ipNetwork + " - " + ipBroadcast
   }
-
 
   function subnetMask() {
     var sub = 0xffffffff
@@ -110,21 +162,6 @@
     sub = splitBinToIp(sub)
     sub = bitToDec(sub[0]) + '.' + bitToDec(sub[1]) + '.' + bitToDec(sub[2]) + '.' + bitToDec(sub[3])
     return sub
-  }
-
-  function networkAddress(){
-    var ips = ip.value.split('.')
-    var bitString = ""
-    for (var i=0; i<4; i++) {
-      bitString += decToBit(ips[i])
-    }
-
-    for(var i=subnet; i<32; i++){
-      bitString = replaceStringAt(bitString, '0', i)
-    }
-    bitString = splitBit(bitString)
-    bitString = bitToDec(bitString[0]) + '.' + bitToDec(bitString[1]) + '.' + bitToDec(bitString[2]) + '.' + bitToDec(bitString[3])
-    return bitString
   }
 
   function binSubnetMask () {
@@ -152,15 +189,6 @@
     }
   }
 
-  function splitBit(ipString){
-    blocks = []
-    blocks[0] = ipString.substring(0,8)
-    blocks[1] = ipString.substring(8,16)
-    blocks[2] = ipString.substring(16,24)
-    blocks[3] = ipString.substring(24,32)
-    return blocks
-  }
-
   function invertAddress () {
     var ips = ip.value.split('.')
     return ips[3] + '.' + ips[2] + '.' + ips[1] + '.' +  ips[0] + ".in-addr.arpa"
@@ -173,71 +201,6 @@
       bitString += decToBit(ips[i])
     }
     return bitString
-  }
-
-  function ipRange () {
-    var ipNetwork = networkAddress()
-    var ipBroadcast = broadcastAddress()
-    if (ipNetwork == ipBroadcast) {
-      return "NA"
-    }
-
-    var ipNetworks = ipNetwork.split('.')
-    var ipBroadcasts = ipBroadcast.split('.')
-
-    ipNetworks[3] = parseInt(ipNetworks[3]) + 1;
-    ipBroadcasts[3] -= 1;
-
-    ipNetwork = ipNetworks[0] + '.' + ipNetworks[1] + '.' + ipNetworks[2] + '.' + ipNetworks[3]
-    ipBroadcast = ipBroadcasts[0] + '.' + ipBroadcasts[1] + '.' + ipBroadcasts[2] + '.' + ipBroadcasts[3]
-
-    return ipNetwork + " - " + ipBroadcast
-  }
-
-  function decToBit(string) {
-    var bitString = parseInt(string, 10).toString(2)
-    while (bitString.length < 8) {
-      bitString = '0' + bitString
-    }
-    return bitString
-  }
-
-  function broadcastAddress(){
-    var ips = ip.value.split('.')
-    var bitString = ""
-    for (var i=0; i<32; i++) {
-      bitString += decToBit(ips[i])
-    }
-
-    for(var i=subnet; i<32; i++){
-      bitString = replaceStringAt(bitString, '1', i)
-    }
-    bitString = splitBit(bitString)
-    bitString = bitToDec(bitString[0]) + '.' + bitToDec(bitString[1]) + '.' + bitToDec(bitString[2]) + '.' + bitToDec(bitString[3])
-    return bitString
-  }
-
-  function createPossibleTable() {
-    headers = ["Network Address", "Usable Host Range", "Broadcast Address:"]
-    data = [];
-    possibleTable.innerHTML = ""
-    var tr = document.createElement("tr");
-    for (var i=0; i<headers.length; i++) {
-     var txt = document.createTextNode(headers[i]);
-     var th = document.createElement("th");
-     th.appendChild(txt);
-     tr.appendChild(th)
-     possibleTable.appendChild(tr);
-    }
-
-    var tr = document.createElement("tr");
-    for (var i=0; i<data.length; i++) {
-     var txt = document.createTextNode(data[i]);
-     var td = document.createElement("td");
-     td.appendChild(txt);
-     tr.appendChild(td)
-     possibleTable.appendChild(tr);
-    }
   }
 
   function WildcardMask () {
@@ -257,7 +220,6 @@
   function ipType() {
     var p = "Private"
     var ips = ip.value.split('.')
-    console.log(ips)
     if(ips[0] == "192" && ips[1] == "168"){
       return p
     }
@@ -270,13 +232,85 @@
     return "Public"
   }
 
+  function broadcastAddress(ip){
+    var ips = ip.split('.')
+    var bitString = ""
+    for (var i=0; i<MAXBIT; i++) {
+      bitString += decToBit(ips[i])
+    }
+
+    for(var i=subnet.value; i<MAXBIT; i++){
+      bitString = replaceStringAt(bitString, '1', i)
+    }
+    bitString = splitBit(bitString)
+    bitString = bitToDec(bitString[0]) + '.' + bitToDec(bitString[1]) + '.' + bitToDec(bitString[2]) + '.' + bitToDec(bitString[3])
+    return bitString
+  }
+
+  function mergeIp (ipArray) {
+    return ipArray[0] + '.' + ipArray[1] + '.' + ipArray[2] + '.' + ipArray[3]
+  }
+
+  function getAllGroups () {
+    var startIps = ip.value.split('.')
+    var classNumber = subnet.value / 8
+    classNumber = parseInt(classNumber)
+    for(var i = classNumber; i < BLOCKS; i++) {
+      startIps[i] = "0"
+    }
+    startIps = mergeIp(startIps)
+
+    var range = Math.pow(2, ((classNumber + 1) * 8) - subnet.value)
+    var network = startIps
+    var broadcast
+    var rangeAddress
+    var result = []
+    var i = 0
+
+    do {
+      broadcast = broadcastAddress(network)
+      rangeAddress = ipRange(network, broadcast)
+
+      result[i++] = [network, rangeAddress, broadcast]
+
+      network = network.split('.')
+      network[classNumber] = parseInt(network[classNumber]) + range
+      network = mergeIp(network)
+    } while (parseInt(broadcast.split('.')[classNumber]) < 255)
+    return result
+  }
+
+  function createPossibleTable() {
+    headers = ["Network Address", "Usable Host Range", "Broadcast Address:"]
+    data = getAllGroups()
+    possibleTable.innerHTML = ""
+    var tr = document.createElement("tr")
+    for (var i=0; i<headers.length; i++) {
+      var text = document.createTextNode(headers[i])
+      var th = document.createElement("th")
+      th.appendChild(text)
+      tr.appendChild(th)
+      possibleTable.appendChild(tr)
+    }
+    for (var i=0; i<data.length; i++) {
+      var tr = document.createElement("tr")
+      for (var j=0; j<data[i].length; j++) {
+        var text = document.createTextNode(data[i][j])
+        var td = document.createElement("td")
+        td.appendChild(text)
+        tr.appendChild(td)
+      }
+      possibleTable.appendChild(tr)
+    }
+  }
+
   function createBaseTable() {
     headers = ["IP Address", "Network Address", "Usable Host IP Range", "Broadcast Address", "Total Number of Hosts", "Number of Usable Hosts", "Subnet Mask", "Wildcard Mask", "Binary Subnet Mask", "IP Class", "CIDR Notation", "IP Type", "Short", "Binary ID", "Integer ID", "Hex ID", "in-addr.arpa", "IPv4 Mapped Address", "6to4 Prefix"]
     data = [];
     data[0] = ip.value
     data[1] = networkAddress()
-    data[2] = ipRange()
-    data[3] = broadcastAddress()
+    data[2] = ipRange(networkAddress(), broadcastAddress(ip.value))
+    data[3] = broadcastAddress(ip.value)
     data[4] = Math.pow(2, MAXBIT - subnet.value)
     data[5] = data[4] > 2 ? data[4] - 2 : 0
     data[6] = subnetMask()
