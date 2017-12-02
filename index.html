@@ -117,6 +117,19 @@
     return blocks
   }
 
+  function mergeBinToDecIp(bitString){
+    return bitToDec(bitString[0]) + '.' + bitToDec(bitString[1]) + '.' + bitToDec(bitString[2]) + '.' + bitToDec(bitString[3])
+  }
+
+  function mergeIp (ipArray) {
+    return ipArray[0] + '.' + ipArray[1] + '.' + ipArray[2] + '.' + ipArray[3]
+  }
+
+  function invertAddress () {
+    var ips = ip.value.split('.')
+    return mergeIp(ips) + ".in-addr.arpa"
+  }
+
   // Main function
 
   function networkAddress(){
@@ -130,7 +143,7 @@
       bitString = replaceStringAt(bitString, '0', i)
     }
     bitString = splitBit(bitString)
-    bitString = bitToDec(bitString[0]) + '.' + bitToDec(bitString[1]) + '.' + bitToDec(bitString[2]) + '.' + bitToDec(bitString[3])
+    bitString = mergeBinToDecIp(bitString)
     return bitString
   }
 
@@ -147,10 +160,25 @@
     ipNetworks[3] = parseInt(ipNetworks[3]) + 1;
     ipBroadcasts[3] -= 1;
 
-    ipNetwork = ipNetworks[0] + '.' + ipNetworks[1] + '.' + ipNetworks[2] + '.' + ipNetworks[3]
-    ipBroadcast = ipBroadcasts[0] + '.' + ipBroadcasts[1] + '.' + ipBroadcasts[2] + '.' + ipBroadcasts[3]
+    ipNetwork = mergeIp(ipNetworks)
+    ipBroadcast = mergeIp(ipBroadcasts)
 
     return ipNetwork + " - " + ipBroadcast
+  }
+
+  function broadcastAddress(ip){
+    var ips = ip.split('.')
+    var bitString = ""
+    for (var i=0; i<MAXBIT; i++) {
+      bitString += decToBit(ips[i])
+    }
+
+    for(var i=subnet.value; i<MAXBIT; i++){
+      bitString = replaceStringAt(bitString, '1', i)
+    }
+    bitString = splitBit(bitString)
+    bitString = mergeBinToDecIp(bitString)
+    return bitString
   }
 
   function subnetMask() {
@@ -160,7 +188,7 @@
       sub = replaceStringAt(sub, '0', i)
     }
     sub = splitBinToIp(sub)
-    sub = bitToDec(sub[0]) + '.' + bitToDec(sub[1]) + '.' + bitToDec(sub[2]) + '.' + bitToDec(sub[3])
+    sub = mergeBinToDecIp(sub)
     return sub
   }
 
@@ -171,7 +199,7 @@
       sub = replaceStringAt(sub, '0', i)
     }
     sub = splitBit(sub)
-    return sub[0] + '.' + sub[1] + '.' + sub[2] + '.' + sub[3]
+    return mergeIp(sub)
   }
 
   function subClass(){
@@ -187,11 +215,6 @@
     else if(subnet.value <= 32){
       return 'C'
     }
-  }
-
-  function invertAddress () {
-    var ips = ip.value.split('.')
-    return ips[3] + '.' + ips[2] + '.' + ips[1] + '.' +  ips[0] + ".in-addr.arpa"
   }
 
   function binId () {
@@ -213,7 +236,7 @@
       }
     }
     sub = bitString.split('.')
-    sub = bitToDec(sub[0]) + '.' + bitToDec(sub[1]) + '.' + bitToDec(sub[2]) + '.' + bitToDec(sub[3])
+    sub = mergeBinToDecIp(sub)
     return sub
   }
 
@@ -230,25 +253,6 @@
       return p
     }
     return "Public"
-  }
-
-  function broadcastAddress(ip){
-    var ips = ip.split('.')
-    var bitString = ""
-    for (var i=0; i<MAXBIT; i++) {
-      bitString += decToBit(ips[i])
-    }
-
-    for(var i=subnet.value; i<MAXBIT; i++){
-      bitString = replaceStringAt(bitString, '1', i)
-    }
-    bitString = splitBit(bitString)
-    bitString = bitToDec(bitString[0]) + '.' + bitToDec(bitString[1]) + '.' + bitToDec(bitString[2]) + '.' + bitToDec(bitString[3])
-    return bitString
-  }
-
-  function mergeIp (ipArray) {
-    return ipArray[0] + '.' + ipArray[1] + '.' + ipArray[2] + '.' + ipArray[3]
   }
 
   function getAllGroups () {
