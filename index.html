@@ -145,11 +145,6 @@
     return ipArray[0] + '.' + ipArray[1] + '.' + ipArray[2] + '.' + ipArray[3]
   }
 
-  function invertAddress () {
-    var ips = ip.value.split('.')
-    return mergeIp(ips) + ".in-addr.arpa"
-  }
-
   // Main function
 
   function networkAddress(){
@@ -273,6 +268,11 @@
       return p
     }
     return "Public"
+  }
+
+  function invertAddress () {
+    var ips = ip.value.split('.')
+    return ips[3] + '.' + ips[2] + '.' + ips[1] + '.' +  ips[0] + ".in-addr.arpa"
   }
 
   function getAllGroups () {
